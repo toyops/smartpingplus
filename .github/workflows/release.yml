@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Build frontend
+        working-directory: web
+        run: |
+          npm ci
+          npm run build   # 输出到 ../src/http/static，供 go:embed 嵌入
+
+      - name: Build backends
+        run: |
+          CGO_ENABLED=0 GOOS=linux   GOARCH=amd64 go build -trimpath -ldflags '-s -w' -o stage/linux-amd64/smartpingplus/bin/smartpingplus     src/smartping.go
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -ldflags '-s -w' -o stage/windows-amd64/smartpingplus/bin/smartpingplus.exe src/smartping.go
+          CGO_ENABLED=0 GOOS=darwin  GOARCH=arm64 go build -trimpath -ldflags '-s -w' -o stage/darwin-arm64/smartpingplus/bin/smartpingplus     src/smartping.go
+
+      - name: Package
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          STAGE=stage
+
+          # 通用文件：配置模板（首启自动生成 config.toml / targets.toml）、出厂库、告警声音
+          for plat in linux-amd64 windows-amd64 darwin-arm64; do
+            dir="$STAGE/$plat/smartpingplus"
+            mkdir -p "$dir/conf" "$dir/db"
+            cp conf/config-base.toml conf/seelog.xml "$dir/conf/"
+            cp db/database-base.db "$dir/db/"
+            cp alert.mp3 "$dir/"
+          done
+
+          # Linux / macOS：附 control 管理脚本
+          cp control stage/linux-amd64/smartpingplus/
+          cp control stage/darwin-arm64/smartpingplus/
+
+          # Windows：附 control.cmd 与 nssm.exe（注册系统服务用）
+          cp control.cmd stage/windows-amd64/smartpingplus/
+          cp bin/nssm.exe stage/windows-amd64/smartpingplus/bin/
+
+          mkdir -p dist-release
+          tar -czf "dist-release/smartpingplus-$TAG-linux-amd64.tar.gz" -C stage/linux-amd64 smartpingplus
+          tar -czf "dist-release/smartpingplus-$TAG-darwin-arm64.tar.gz" -C stage/darwin-arm64 smartpingplus
+          cd stage/windows-amd64 && zip -r "../../dist-release/smartpingplus-$TAG-windows-amd64.zip" smartpingplus && cd ../..
+
+          cd dist-release && sha256sum smartpingplus-* > checksums.txt && cat checksums.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist-release/*
+          generate_release_notes: true

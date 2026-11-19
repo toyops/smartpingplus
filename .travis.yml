@@ -1,9 +1,0 @@
-language: go
-
-matrix:
-  include:
-    - go: "1.21.x"
-
-
-script:
-  - go build ./src/smartping.go
