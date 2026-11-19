@@ -1,0 +1,35 @@
+# ============================================================
+# SmartPing 抓取配置 (TOML)
+#
+# 检测目标与告警规则：
+#   [PingTargets] ICMP 检测目标：目标地址 = 显示名称
+#   [TcpTargets]  TCP 检测目标：host:port = 显示名称
+#   [AlertRules]  拓扑告警规则（目标异常时触发报警的阈值）
+# 本文件由 Web 界面"保存配置"写回。
+# ============================================================
+
+[PingTargets]
+  "119.29.29.29" = "AliDNS"
+  "127.0.0.1" = "本机"
+
+[TcpTargets]
+  "127.0.0.1:8899" = "本机"
+  "8.8.4.4:53" = "Google DNS"
+  "cloud.tencent.com:443" = "腾讯云"
+  "www.baidu.com:443" = "百度"
+
+[[AlertRules]]
+  Addr = "119.29.29.29"
+  Name = "AliDNS"
+  Thdavgdelay = "200"
+  Thdchecksec = "900"
+  Thdloss = "30"
+  Thdoccnum = "3"
+
+[[AlertRules]]
+  Addr = "123.125.114.144"
+  Name = "百度"
+  Thdavgdelay = "200"
+  Thdchecksec = "900"
+  Thdloss = "30"
+  Thdoccnum = "3"

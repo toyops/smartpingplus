@@ -1,0 +1,53 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE & editors
+.idea/
+.vscode/
+*.iml
+
+# Local agent working notes
+.workbuddy/
+
+# Binaries & build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.a
+bin/*
+!bin/nssm.exe*
+dist/
+
+# Logs & temp files
+logs/*
+*.log
+*-journal
+*.db-journal
+
+# Database & configs
+db/database.db
+db/ping/*.db
+db/ping/*.lock
+db/alert/*.db
+db/alert/*.lock
+db/mapping/*.db
+db/mapping/*.lock
+conf/config.json
+conf/.jwt_secret
+
+# Frontend dependencies & builds
+web/node_modules/
+web/dist/
+
+# Test coverage & binaries
+*.test
+*.out
+src/test*

@@ -1,0 +1,58 @@
+# ============================================================
+# SmartPing 通用配置 (TOML)
+#
+# 本目录下配置文件的关系：
+#   - config.toml       通用配置（服务参数）。启动时读取，Web 界面"保存配置"写回。
+#   - config-base.toml  通用配置出厂模板。仅当 config.toml 不存在时，首次启动
+#                       会自动复制它为 config.toml（用于恢复出厂设置）。
+#   - targets.toml      抓取配置（Ping/TcpPing 检测目标与告警规则）。
+#                       缺失时首次启动自动生成默认目标（AliDNS + 本机）。
+# ============================================================
+
+Ver = "0.8.0"
+Port = 8899
+Name = "本机"
+Addr = "127.0.0.1"
+Toollimit = 0
+Authiplist = ""
+Password = "smartping"
+
+[Mode]
+  Endpoint = ""
+  LastSuccTime = ""
+  Status = "true"
+  Type = "local"
+
+[Base]
+  Archive = 10
+  Refresh = 1
+  Timeout = 5
+
+[Topology]
+  Tline = "1"
+  Tsound = "/alert.mp3"
+  Tsymbolsize = "70"
+
+[Alert]
+  EmailHost = ""
+  RevcEmailList = ""
+  SendEmailAccount = ""
+  SendEmailPassword = ""
+
+[Chinamap]
+  [Chinamap."上海"]
+    cmcc = ["117.184.42.114"]
+    ctcc = ["180.163.15.160"]
+    cucc = ["223.167.104.117"]
+  [Chinamap."北京"]
+    cmcc = ["111.13.217.125"]
+    ctcc = ["120.92.180.135"]
+    cucc = ["111.207.189.5"]
+  [Chinamap."广东"]
+    cmcc = ["120.236.14.140"]
+    ctcc = ["218.17.216.171"]
+    cucc = ["58.252.2.194"]
+  [Chinamap."浙江"]
+    cmcc = ["183.246.69.139"]
+    ctcc = ["115.236.169.86"]
+    cucc = ["60.12.214.156"]
